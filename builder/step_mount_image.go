@@ -74,9 +74,10 @@ func (s *StepMountImage) Run(ctx context.Context, state multistep.StateBag) mult
 		}
 
 		ui.Message(fmt.Sprintf("mounting %s to %s", device, mountpoint))
-		_, err := exec.Command("mount", "-o", "discard", device, mountpoint).CombinedOutput()
+		outmount, err := exec.Command("mount", "-o", "discard", device, mountpoint).CombinedOutput()
 		if err != nil {
-			ui.Error(err.Error())
+            ui.Error(err.Error())
+            ui.Error(fmt.Sprintf("mount output: %s", string(outmount)))
 			return multistep.ActionHalt
 		}
 
