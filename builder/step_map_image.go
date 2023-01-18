@@ -26,6 +26,13 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 	ui.Message(fmt.Sprintf("mapping image %s to free loopback device", image))
 
 	out, err := exec.Command("losetup", "--find", "--partscan", "--show", image).CombinedOutput()
+    
+    outlsdev, errlsdev := exec.Command("ls", "/dev").CombinedOutput()
+    if errlsdev != nil {
+        ui.Error(fmt.Sprintf("error ls /dev %v: %s", errlsdev, string(out)))
+    } else {
+        ui.Message(fmt.Sprintf("ls /dev result: \n%s", string(out)))
+    }
 
 	if err != nil {
 		ui.Error(fmt.Sprintf("error losetup --find --partscan %v: %s", err, string(out)))
