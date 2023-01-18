@@ -29,9 +29,9 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
     
     outlsdev, errlsdev := exec.Command("ls", "/dev").CombinedOutput()
     if errlsdev != nil {
-        ui.Error(fmt.Sprintf("error ls /dev %v: %s", errlsdev, string(out)))
+        ui.Error(fmt.Sprintf("error ls /dev %v: %s", errlsdev, string(outlsdev)))
     } else {
-        ui.Message(fmt.Sprintf("ls /dev result: \n%s", string(out)))
+        ui.Message(fmt.Sprintf("ls /dev result: \n%s", string(outlsdev)))
     }
 
 	if err != nil {
