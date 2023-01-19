@@ -37,7 +37,9 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 	if err != nil {
 		ui.Error(fmt.Sprintf("error losetup --find --partscan %v: %s", err, string(out)))
 		return multistep.ActionHalt
-	}
+    } else {
+        ui.Message(fmt.Sprintf("losetup output: %s", string(out)))
+    }
 	s.loopDevice = strings.Trim(string(out), "\n")
 
 	state.Put(s.ResultKey, s.loopDevice)
