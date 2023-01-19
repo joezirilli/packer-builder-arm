@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+    "time"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/packer"
@@ -26,7 +27,7 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 	ui.Message(fmt.Sprintf("mapping image %s to free loopback device", image))
 
 	out, err := exec.Command("losetup", "--find", "--partscan", "--show", "--verbose", image).CombinedOutput()
-    
+    time.Sleep(5 * time.Second)
     outlsdev, errlsdev := exec.Command("ls", "/dev").CombinedOutput()
     if errlsdev != nil {
         ui.Error(fmt.Sprintf("error ls /dev %v: %s", errlsdev, string(outlsdev)))
