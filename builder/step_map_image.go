@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
-	"strings"
     "regexp"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
