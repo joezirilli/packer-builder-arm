@@ -35,7 +35,7 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
     outstr := string(out)
 
     loopDeviceName := regexp.MustCompile("loop\\d").FindString(outstr)
-    for _, partitionDeviceName := range regexp.MustCompile("\loop\\dp\\d") {
+    for _, partitionDeviceName := range regexp.MustCompile("loop\\dp\\d") {
         partitionDevice := "/dev/mapper/" + partitionDeviceName
         symlink := "/dev/" + partitionDeviceName
         ui.Message(fmt.Sprintf("creating symlink %s for partition device %s", symlink, partitionDevice))
