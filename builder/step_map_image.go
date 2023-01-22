@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+    "regexp"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/packer"
@@ -25,13 +26,17 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 	// ask losetup to find empty device and map image
 	ui.Message(fmt.Sprintf("mapping image %s to free loopback device", image))
 
-	out, err := exec.Command("losetup", "--find", "--partscan", "--show", image).CombinedOutput()
+	out, err := exec.Command("kpartx", "-avs", image).CombinedOutput()
 
 	if err != nil {
 		ui.Error(fmt.Sprintf("error losetup --find --partscan %v: %s", err, string(out)))
 		return multistep.ActionHalt
 	}
-	s.loopDevice = strings.Trim(string(out), "\n")
+
+    // points loop device to /dev/mapper/loop{n} even though it doesn't exist, but partition
+    // devices will exist in /dev/mapper, e.g. /dev/mapper/loop{n}p1, which is all that's needed
+    // for step_mount_image.go
+    s.loopDevice = "/dev/mapper/" + regexp.MustCompile("loop\\d").FindString(string(out))
 
 	state.Put(s.ResultKey, s.loopDevice)
 	ui.Message(fmt.Sprintf("image %s mapped to %s", image, s.loopDevice))
