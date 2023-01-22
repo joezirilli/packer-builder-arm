@@ -31,11 +31,17 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 		ui.Error(fmt.Sprintf("error losetup --find --partscan %v: %s", err, string(out)))
 		return multistep.ActionHalt
 	}
+    
+    outstr := string(out)
 
-    // points loop device to /dev/mapper/loop{n} even though it doesn't exist, but partition
-    // devices will exist in /dev/mapper, e.g. /dev/mapper/loop{n}p1, which is all that's needed
-    // for step_mount_image.go
-    s.loopDevice = "/dev/mapper/" + regexp.MustCompile("loop\\d").FindString(string(out))
+    loopDeviceName := regexp.MustCompile("loop\\d").FindString(outstr)
+    for _, partitionDeviceName := range regexp.MustCompile("\loop\\dp\\d") {
+        partitionDevice := "/dev/mapper/" + partitionDeviceName
+        symlink := "/dev/" + partitionDeviceName
+        ui.Message(fmt.Sprintf("creating symlink %s for partition device %s", symlink, partitionDevice))
+        exec.Command("ln", "-s", partitionDevice, symlink)
+    }
+    s.loopDevice = "/dev/" + loopDeviceName
 
 	state.Put(s.ResultKey, s.loopDevice)
 	ui.Message(fmt.Sprintf("image %s mapped to %s", image, s.loopDevice))
