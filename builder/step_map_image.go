@@ -28,14 +28,16 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 	out, err := exec.Command("kpartx", "-avs", image).CombinedOutput()
 
 	if err != nil {
-		ui.Error(fmt.Sprintf("error losetup --find --partscan %v: %s", err, string(out)))
+		ui.Error(fmt.Sprintf("error kpartx -avs %v: %s", err, string(out)))
 		return multistep.ActionHalt
 	}
     
     outstr := string(out)
-
     loopDeviceName := regexp.MustCompile("loop\\d").FindString(outstr)
-    for _, partitionDeviceName := range regexp.MustCompile("loop\\dp\\d").FindAllString(outstr, -1) {
+    partitionDeviceNames := regexp.MustCompile("loop\\dp\\d").FindAllString(outstr, -1)
+    ui.Message(fmt.Sprintf("Using loop device: %s. Partition devices: %v. kpartx output: %s", loopDeviceName, partitionDeviceNames, outstr))
+    
+    for _, partitionDeviceName := range partitionDeviceNames {
         partitionDevice := "/dev/mapper/" + partitionDeviceName
         symlink := "/dev/" + partitionDeviceName
         ui.Message(fmt.Sprintf("creating symlink %s for partition device %s", symlink, partitionDevice))
