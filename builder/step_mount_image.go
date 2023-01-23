@@ -74,9 +74,9 @@ func (s *StepMountImage) Run(ctx context.Context, state multistep.StateBag) mult
 		}
 
 		ui.Message(fmt.Sprintf("mounting %s to %s", device, mountpoint))
-		_, err := exec.Command("mount", "-o", "discard", device, mountpoint).CombinedOutput()
+		mountout, err := exec.Command("mount", "-o", "discard", device, mountpoint).CombinedOutput()
 		if err != nil {
-			ui.Error(err.Error())
+            ui.Error(fmt.Sprintf("failed to mount device %s to %s: %s. out: %s", device, mountpoint, err.Error(), string(mountout)))
 			return multistep.ActionHalt
 		}
 
@@ -98,9 +98,9 @@ func (s *StepMountImage) Cleanup(state multistep.StateBag) {
 		for _, partition := range partitions {
 			mountpoint := filepath.Join(s.MountPath, partition.Mountpoint)
 			ui.Message(fmt.Sprintf("unmounting %s", mountpoint))
-			_, err := exec.Command("umount", mountpoint).CombinedOutput()
+			umountout, err := exec.Command("umount", mountpoint).CombinedOutput()
 			if err != nil {
-				ui.Error(fmt.Sprintf("failed to unmount %s: %s", mountpoint, err.Error()))
+                ui.Error(fmt.Sprintf("failed to unmount %s: %s. out: %s", mountpoint, err.Error(), string(umountout)))
 			}
 		}
 		s.mountpoints = nil
