@@ -33,8 +33,8 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 	}
     
     outstr := string(out)
-    loopDeviceName := regexp.MustCompile("loop\\d").FindString(outstr)
-    partitionDeviceNames := regexp.MustCompile("loop\\dp\\d").FindAllString(outstr, -1)
+    loopDeviceName := regexp.MustCompile("loop\\d+").FindString(outstr)
+    partitionDeviceNames := regexp.MustCompile("loop\\d+p\\d+").FindAllString(outstr, -1)
     ui.Message(fmt.Sprintf("Using loop device: %s. Partition devices: %v. kpartx output: %s", loopDeviceName, partitionDeviceNames, outstr))
     
     for _, partitionDeviceName := range partitionDeviceNames {
