@@ -25,7 +25,7 @@ func (s *StepMapImage) Run(_ context.Context, state multistep.StateBag) multiste
 	// ask losetup to find empty device and map image
 	ui.Message(fmt.Sprintf("mapping image %s to free loopback device", image))
 
-	out, err := exec.Command("kpartx", "-avs", image).CombinedOutput()
+	out, err := exec.Command("kpartx", "-avsf", image).CombinedOutput()
 
 	if err != nil {
 		ui.Error(fmt.Sprintf("error kpartx -avs %v: %s", err, string(out)))
