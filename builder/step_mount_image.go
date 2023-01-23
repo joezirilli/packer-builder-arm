@@ -67,7 +67,7 @@ func (s *StepMountImage) Run(ctx context.Context, state multistep.StateBag) mult
 	partitions := sortMountablePartitions(config.ImageConfig.ImagePartitions, false)
 	for _, partition := range partitions {
 		mountpoint := filepath.Join(s.MountPath, partition.Mountpoint)
-        loopDeviceActualPath = strings.Replace(loopDevice, "/dev/", "/dev/mapper/")
+        loopDeviceActualPath = strings.Replace(loopDevice, "/dev/", "/dev/mapper/", -1)
 		device := fmt.Sprintf("%sp%d", loopDeviceActualPath, partition.Index)
 
 		if err := os.MkdirAll(mountpoint, 0755); err != nil {
